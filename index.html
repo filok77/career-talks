@@ -1103,5 +1103,12 @@
     </section>
 
   </main>
+<script>
+  window.onload = function() {
+    window.parent.postMessage(
+      { height: document.body.scrollHeight }, '*'
+    );
+  };
+</script>
 </body>
 </html>
