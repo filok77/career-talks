@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ako vybudovať fungujúci podcast v kariérnej oblasti</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:       #0d0f14;
+      --surface:  #161920;
+      --surface2: #1e2230;
+      --border:   #2a2f42;
+      --accent:   #e8c547;
+      --accent2:  #4f9cf9;
+      --accent3:  #e05a5a;
+      --text:     #e8eaf0;
+      --muted:    #7a8099;
+      --radius:   12px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    /* ── NOISE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      padding: 80px 40px 60px;
+      max-width: 1000px;
+      margin: 0 auto;
+      z-index: 1;
+    }
+
+    .hero-tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 5px 14px;
+      border-radius: 100px;
+      margin-bottom: 28px;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.1s forwards;
+    }
+
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.4rem, 5vw, 4rem);
+      font-weight: 900;
+      line-height: 1.15;
+      color: #fff;
+      max-width: 720px;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.2s forwards;
+    }
+
+    .hero h1 span {
+      color: var(--accent);
+    }
+
+    .hero-divider {
+      width: 60px;
+      height: 3px;
+      background: var(--accent);
+      margin: 28px 0;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.3s forwards;
+    }
+
+    .hero-sub {
+      font-size: 1.05rem;
+      color: var(--muted);
+      max-width: 600px;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.4s forwards;
+    }
+
+    /* ── LAYOUT ── */
+    .content {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 40px 100px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── PHASE CARDS ── */
+    .phase {
+      margin-bottom: 56px;
+      opacity: 0;
+      animation: fadeUp 0.6s forwards;
+    }
+    .phase:nth-child(1)  { animation-delay: 0.1s; }
+    .phase:nth-child(2)  { animation-delay: 0.2s; }
+    .phase:nth-child(3)  { animation-delay: 0.3s; }
+    .phase:nth-child(4)  { animation-delay: 0.4s; }
+    .phase:nth-child(5)  { animation-delay: 0.5s; }
+    .phase:nth-child(6)  { animation-delay: 0.6s; }
+    .phase:nth-child(7)  { animation-delay: 0.7s; }
+    .phase:nth-child(8)  { animation-delay: 0.8s; }
+    .phase:nth-child(9)  { animation-delay: 0.9s; }
+
+    .phase-header {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+
+    .phase-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--accent);
+      text-transform: uppercase;
+      white-space: nowrap;
+      border-right: 1px solid var(--border);
+      padding-right: 18px;
+    }
+
+    .phase h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.3rem, 2.5vw, 1.75rem);
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.2;
+    }
+
+    .phase h3 {
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--accent2);
+      margin: 32px 0 12px;
+    }
+
+    .phase h4 {
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 24px 0 10px;
+    }
+
+    .phase p {
+      color: #c0c4d4;
+      margin-bottom: 14px;
+    }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 12px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .card:hover {
+      border-color: var(--accent2);
+      transform: translateX(4px);
+    }
+
+    /* ── LIST ITEMS ── */
+    .phase ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .phase ul li {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 18px 14px 48px;
+      position: relative;
+      color: #c0c4d4;
+      font-size: 0.95rem;
+      transition: border-color 0.2s;
+    }
+
+    .phase ul li:hover {
+      border-color: var(--border);
+    }
+
+    .phase ul li::before {
+      content: '→';
+      position: absolute;
+      left: 18px;
+      top: 14px;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .phase ul li strong {
+      color: #e8eaf0;
+      font-weight: 600;
+    }
+
+    /* ── BLOCKQUOTE ── */
+    blockquote {
+      background: linear-gradient(135deg, #1a1d2a, #1e2230);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      padding: 20px 24px;
+      margin: 24px 0;
+      color: #c0c4d4;
+      font-style: italic;
+    }
+
+    blockquote strong {
+      color: var(--accent);
+      font-style: normal;
+      display: block;
+      margin-bottom: 8px;
+      font-size: 0.78rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* ── TABLES ── */
+    .table-wrap {
+      overflow-x: auto;
+      margin: 16px 0;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 560px;
+      font-size: 0.9rem;
+    }
+
+    thead tr {
+      background: var(--surface2);
+    }
+
+    th {
+      padding: 13px 16px;
+      text-align: left;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 13px 16px;
+      border-bottom: 1px solid var(--border);
+      color: #c0c4d4;
+      vertical-align: top;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    tbody tr {
+      background: var(--surface);
+      transition: background 0.15s;
+    }
+
+    tbody tr:hover { background: var(--surface2); }
+
+    td strong { color: var(--accent); }
+
+    /* ── TOK ENERGIE ── */
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin: 16px 0;
+    }
+
+    .flow-item {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 7px 14px;
+      font-size: 0.87rem;
+      color: #c0c4d4;
+      white-space: nowrap;
+    }
+
+    .flow-arrow {
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    /* ── PILLAR GRID ── */
+    .pillar-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .pillar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      text-align: center;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .pillar:hover {
+      border-color: var(--accent2);
+      transform: translateY(-3px);
+    }
+
+    .pillar-icon {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+
+    .pillar-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent2);
+      margin-bottom: 6px;
+    }
+
+    .pillar-desc {
+      font-size: 0.83rem;
+      color: var(--muted);
+    }
+
+    /* ── GATE CARDS ── */
+    .gate-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px;
+      margin: 16px 0;
+    }
+
+    .gate-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      transition: border-color 0.2s;
+    }
+
+    .gate-card:hover { border-color: var(--accent2); }
+
+    .gate-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+
+    .gate-when {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .gate-criteria {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .gate-criteria > div {
+      font-size: 0.85rem;
+      padding: 8px 12px;
+      border-radius: 6px;
+    }
+
+    .go   { background: rgba(79,156,100,0.15); border: 1px solid rgba(79,156,100,0.3); color: #6dc98a; }
+    .pivot { background: rgba(79,156,249,0.1); border: 1px solid rgba(79,156,249,0.25); color: #4f9cf9; }
+    .kill { background: rgba(224,90,90,0.1); border: 1px solid rgba(224,90,90,0.25); color: #e05a5a; }
+
+    .gate-criteria > div::before {
+      font-weight: 700;
+      margin-right: 6px;
+    }
+    .go::before   { content: '✓ GO:'; }
+    .pivot::before { content: '↻ PIVOT:'; }
+    .kill::before { content: '✕ KILL:'; }
+
+    /* ── SUMMARY BOX ── */
+    .summary-box {
+      background: linear-gradient(135deg, #1a2035, #1e1a2e);
+      border: 1px solid #3a3060;
+      border-radius: var(--radius);
+      padding: 32px;
+      margin-top: 16px;
+    }
+
+    .summary-row {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+      padding: 14px 0;
+      align-items: start;
+    }
+
+    .summary-row:last-child { border-bottom: none; }
+
+    .summary-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      padding-top: 2px;
+    }
+
+    .summary-value {
+      font-size: 0.93rem;
+      color: #c0c4d4;
+    }
+
+    /* ── TIMELINE ── */
+    .timeline {
+      position: relative;
+      padding-left: 32px;
+      margin: 16px 0;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 10px;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: linear-gradient(to bottom, var(--accent), transparent);
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -26px;
+      top: 8px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+    }
+
+    .timeline-phase {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent2);
+      margin-bottom: 8px;
+    }
+
+    .timeline-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .timeline-list li {
+      font-size: 0.9rem;
+      color: #c0c4d4;
+      list-style: none;
+    }
+
+    .timeline-list li::before {
+      content: '–  ';
+      color: var(--muted);
+    }
+
+    .anti-goal {
+      background: rgba(224,90,90,0.08);
+      border: 1px solid rgba(224,90,90,0.2);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 0.85rem;
+      color: #c08080;
+      margin-top: 10px;
+    }
+
+    .anti-goal strong {
+      color: var(--accent3);
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    /* ── BET SIZING ── */
+    .bet-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .bet-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+    }
+
+    .bet-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .bet-label.all-in { color: #6dc98a; }
+    .bet-label.exp    { color: #e8c547; }
+
+    .bet-desc {
+      font-size: 0.87rem;
+      color: #c0c4d4;
+    }
+
+    /* ── SECTION DIVIDER ── */
+    .section-divider {
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--border), transparent);
+      margin: 40px 0;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 700px) {
+      .hero { padding: 50px 20px 40px; }
+      .content { padding: 0 20px 60px; }
+      .summary-row { grid-template-columns: 1fr; gap: 4px; }
+      .phase-num { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════════ HERO ═══════════════ -->
+  <header class="hero">
+    <div class="hero-tag">Sprievodca tvorbou</div>
+    <h1>Ako vybudovať fungujúci <span>podcast</span> v kariérnej oblasti</h1>
+    <div class="hero-divider"></div>
+    <p class="hero-sub">Deväťfázový framework od mapy reality cez rizikovú analýzu až po akčný plán s jasnými GO / PIVOT / KILL kritériami.</p>
+  </header>
+
+  <main class="content">
+
+    <!-- ═══════════════ FÁZA 1 ═══════════════ -->
+    <section class="phase">
+      <div class="phase-header">
+        <span class="phase-num">Fáza 01</span>
+        <h2>Mapa reality</h2>
+      </div>
+
+      <h3>Tvrdé obmedzenia (nemenné)</h3>
+      <ul>
+        <li>Deň má 24 hodín — podcast vyžaduje čas na prípravu, nahrávanie, strih, distribúciu.</li>
+        <li>Algoritmy platforiem (Spotify, Apple, YouTube) sú mimo vašu kontrolu.</li>
+        <li>Hostia majú limitovanú dostupnosť a vlastné priority.</li>
+        <li>Zvuková kvalita je podmienená fyzikou akustiky a hardvéru.</li>
+        <li>Podcastový trh je nasýtený: existuje 4+ milióny podcastov globálne.</li>
+        <li>Pozornosť poslucháča je konečná a vysoko saturovaná.</li>
+      </ul>
+
+      <h3>Mäkké obmedzenia (vyjednateľné)</h3>
+      <ul>
+        <li>Rozpočet na produkciu (dá sa začať za &lt;100 €/mesiac alebo investovať tisíce).</li>
+        <li>Frekvencia vydávania (týždenný nie je povinný — môže byť aj mesačný).</li>
+        <li>Formát (solo, rozhovor, panel — nie je daný).</li>
+        <li>Jazyk a cieľový trh (slovenský, český, anglický — rozhodnutie).</li>
+        <li>Dĺžka epizódy (konvencia 45–60 min nie je fyzika).</li>
+      </ul>
+
+      <h3>Tok energie</h3>
+      <div class="flow">
+        <div class="flow-item">Tvorca obsahu</div><span class="flow-arrow">→</span>
+        <div class="flow-item">Platforma</div><span class="flow-arrow">→</span>
+        <div class="flow-item">Algoritmus</div><span class="flow-arrow">→</span>
+        <div class="flow-item">Poslucháč</div><span class="flow-arrow">→</span>
+        <div class="flow-item">Engagement</div><span class="flow-arrow">→</span>
+        <div class="flow-item">Rast</div><span class="flow-arrow">→</span>
+        <div class="flow-item">Monetizácia</div>
+      </div>
+      <p style="font-size:0.87rem; color: var(--muted); margin-top:8px;">Hosť prinesie vlastné publikum (cross-pollination efekt).</p>
+
+      <blockquote>
+        <strong>Kľúčový tok</strong>
+        Hodnota pre poslucháča (kariérne insighty) → Zdieľanie → Organický rast → Autorita tvorcu → Monetizácia (sponzori, služby, komunita).
+      </blockquote>
+
+      <h3>Zákony domény</h3>
+      <ul>
+        <li><strong>Power law distribúcia</strong> — Top 1 % podcastov získava 90 %+ stiahnutí. Väčšina nikdy neprekročí 100 stiahnutí/epizódu.</li>
+        <li><strong>Konzistencia > kvalita</strong> — Podcasty vydávajúce pravidelne 6+ mesiacov prekonajú tie, čo vydajú 5 skvelých epizód a zmĺknu.</li>
+        <li><strong>Discovery problém</strong> — Podcasty nemajú natívny virálny mechanizmus. Rast závisí od externej distribúcie.</li>
+        <li><strong>Trust sa buduje pomalým drippom</strong> — Vzťah poslucháč–tvorca je intímny, ale vyžaduje 5–10 epizód na vybudovanie lojality.</li>
+        <li><strong>Niché > broad</strong> — Špecifické zacielenie výrazne zvyšuje zistiteľnosť a lojalitu.</li>
+        <li><strong>Zákon klesajúcej pozornosti</strong> — Každou minútou bez novej hodnoty strácate 5–10 % publika.</li>
+      </ul>
+
+      <h3>Fyzika vs. konvencia</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Fyzika</th><th>Konvencia (mýtus)</th></tr></thead>
+          <tbody>
+            <tr><td>Zvuk musí byť zrozumiteľný</td><td>„Musíte mať profesionálne štúdio"</td></tr>
+            <tr><td>Ľudia počúvajú to, čo im prinesie hodnotu</td><td>„Epizóda musí trvať 60 min"</td></tr>
+            <tr><td>Discovery vyžaduje distribúciu mimo platformu</td><td>„Stačí uploadnúť a ľudia prídu"</td></tr>
+            <tr><td>Dôvera sa buduje opakovane</td><td>„Potrebujem 10 000 followerov na štart"</td></tr>
+            <tr><td>Čas na prípravu je konečný</td><td>„Musím vydávať každý týždeň"</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ═══════════════ FÁZA 2 ═══════════════ -->
+    <section class="phase">
+      <div class="phase-header">
+        <span class="phase-num">Fáza 02</span>
+        <h2>Audit predpokladov</h2>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th><th>Predpoklad</th><th>Kategória</th><th>Čo sa rozbije, ak je nesprávny</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td>„Ľudia chcú kariérne rady formou podcastu"</td><td><strong>Netestované</strong></td><td>Celý projekt nemá trh — je potrebná validácia</td></tr>
+            <tr><td>2</td><td>„Rozhovorový formát je najlepší"</td><td>Konvencia</td><td>Možno solo alebo case-study formát funguje lepšie pre cieľovku</td></tr>
+            <tr><td>3</td><td>„Kvalitní hostia budú chcieť prísť"</td><td><strong>Netestované</strong></td><td>Bez hostí niet obsahu — kritická závislosť</td></tr>
+            <tr><td>4</td><td>„Slovenský/český trh je dostatočne veľký"</td><td>Silný dôkaz</td><td>SK+CZ ~15M ľudí, ale koľkí počúvajú podcasty o kariére?</td></tr>
+            <tr><td>5</td><td>„Podcast buduje osobnú značku automaticky"</td><td>Konvencia</td><td>Podcast bez distribúcie je neviditeľný</td></tr>
+            <tr><td>6</td><td>„Musím mať perfektné vybavenie na štart"</td><td>Konvencia</td><td>Paralýza analýzou — dobrý mikrofón za 50 € stačí</td></tr>
+            <tr><td>7</td><td>„Monetizácia príde s rastom"</td><td><strong>Netestované</strong></td><td>Podcasty sú ťažké na monetizáciu pod 5 000 stiahnutí/ep.</td></tr>
+            <tr><td>8</td><td>„Konzistentné vydávanie = rast"</td><td>Silný dôkaz</td><td>Konzistencia je nutná, ale nie dostatočná — bez distribúcie je zbytočná</td></tr>
+            <tr><td>9</td><td>„Cieľovka sú ‚ľudia, ktorí chcú kariérne rady'"</td><td><strong>Netestované</strong></td><td>Príliš široké — kto presne? Juniorní? Seniori? Pivotéri?</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Testy predpokladov</h3>
+      <ul>
+        <li><strong>Test Outsidera (gaming priemysel):</strong> Season formát (8 ep = 1 séria), jasný narratívny oblúk, gamifikovaný engagement, krátke vertikálne videá ako hlavný akvizičný kanál.</li>
+        <li><strong>Test Inverzie:</strong> Čo ak ľudia NECHCÚ dlhé kariérne podcasty? → Mikroobsah: 5-minútové „career shots" — jeden insight, žiadne fluff. Testovateľné za týždeň.</li>
+        <li><strong>Test Vymazania:</strong> Čo ak vynechám hostí? → Solo podcast s case studies. Eliminuje závislosť od dostupnosti hostí. Výroba sa zrýchli 3×.</li>
+      </ul>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ═══════════════ FÁZA 3 ═══════════════ -->
+    <section class="phase">
+      <div class="phase-header">
+        <span class="phase-num">Fáza 03</span>
+        <h2>Atomická dekompozícia</h2>
+      </div>
+
+      <h3>5 fundamentálnych atómov</h3>
+      <div class="pillar-grid">
+        <div class="pillar">
+          <div class="pillar-icon">💬</div>
+          <div class="pillar-title">Obsah</div>
+          <div class="pillar-desc">Čo sa hovorí — témy, insighty, príbehy</div>
+        </div>
+        <div class="pillar">
+          <div class="pillar-icon">📡</div>
+          <div class="pillar-title">Distribúcia</div>
+          <div class="pillar-desc">Ako sa dostane k ľuďom — discovery mechanizmus</div>
+        </div>
+        <div class="pillar">
+          <div class="pillar-icon">🎙️</div>
+          <div class="pillar-title">Produkcia</div>
+          <div class="pillar-desc">Nahrávanie, strih, publikácia</div>
+        </div>
+        <div class="pillar">
+          <div class="pillar-icon">🤝</div>
+          <div class="pillar-title">Hosťovský pipeline</div>
+          <div class="pillar-desc">Získavanie a manažment hostí</div>
+        </div>
+        <div class="pillar">
+          <div class="pillar-icon">🎯</div>
+          <div class="pillar-title">Monetizácia / Účel</div>
+          <div class="pillar-desc">Prečo to existuje a dlhodobá udržateľnosť</div>
+        </div>
+      </div>
+
+      <h3>Analýza citlivosti (+20 %)</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Atóm</th><th>Dopad zmeny o +20 %</th><th>Váha</th></tr></thead>
+          <tbody>
+            <tr><td>Obsah</td><td>Completion rate stúpne → viac zdieľaní</td><td><strong>Najväčší</strong></td></tr>
+            <tr><td>Distribúcia</td><td>Viac ľudí počuje o podcaste</td><td><strong>Vysoký</strong></td></tr>
+            <tr><td>Hostia</td><td>Prinesú vlastné publikum</td><td>Stredný</td></tr>
+            <tr><td>Produkcia</td><td>Marginálny vplyv nad minimálnym prahom kvality</td><td>Nízky</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <blockquote>
+        <strong>Kľúčový atóm: Distribúcia</strong>
+        Väčšina podcastov zomiera nie kvôli zlému obsahu, ale kvôli nulovej viditeľnosti. Distribúcia je multiplikátor všetkého ostatného — bez nej je aj najlepší obsah neviditeľný.
+      </blockquote>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ═══════════════ FÁZA 4 ═══════════════ -->
+    <section class="phase">
+      <div class="phase-header">
+        <span class="phase-num">Fáza 04</span>
+        <h2>Analýza stakeholderov a silového poľa</h2>
+      </div>
+
+      <h4>Kto profituje zo súčasného stavu (žiadny podcast)?</h4>
+      <ul>
+        <li>Existujúce slovenské/české kariérne podcasty — menej konkurencie.</li>
+        <li>Váš čas zostáva voľný pre iné projekty.</li>
+      </ul>
+
+      <h4>Kto trpí súčasným stavom?</h4>
+      <ul>
+        <li>Vy — nebudujete si autoritu ani osobnú značku.</li>
+        <li>Potenciálni poslucháči, ktorí nemajú kvalitný SK/CZ kariérny obsah.</li>
+        <li>Potenciálni hostia, ktorí nemajú platformu na zdieľanie príbehu.</li>
+      </ul>
+
+      <h3>Silové pole</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Hnacie sily (pre štart)</th><th>Sila</th><th>Brzdné sily (proti)</th><th>Sila</th></tr></thead>
+          <tbody>
+            <tr><td>Budovanie osobnej značky</td><td>5</td><td>Čas a energia</td><td>4</td></tr>
+            <tr><td>Networking s hosťami</td><td>4</td><td>Nasýtený trh</td><td>3</td></tr>
+            <tr><td>Medzera v SK/CZ trhu pre kvalitu</td><td>4</td><td>Pomalý rast podcastov</td><td>4</td></tr>
+            <tr><td>Nízke vstupné náklady</td><td>3</td><td>Ťažká monetizácia</td><td>3</td></tr>
+            <tr><td>Dlhodobý compounding efekt</td><td>5</td><td>Riziko vyhorenia po 10 epizódach</td><td>4</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ═══════════════ FÁZA 5 ═══════════════ -->
+    <section class="phase">
+      <div class="phase-header">
+        <span class="phase-num">Fáza 05</span>
+        <h2>Neobmedzený ideál</h2>
+      </div>
+
+      <h3>10× Verzia</h3>
+      <p>Podcast „Career Talks" nie je len podcast — je kariérna platforma. Podcast je vstupná brána do ekosystému, ktorý zahŕňa komunitu (Discord/Slack), live eventy, mentoring matching a databázu kariérnych príbehov filtrovateľnú podľa odvetvia, seniority a typu prechodu. Každá epizóda má actionable worksheety. Alumni hostí tvoria „Career Talks Network" — neformálnu sieť, kde sa ľudia prepájajú.</p>
+
+      <blockquote>
+        <strong>Sen používateľa</strong>
+        „Chcem počuť reálne príbehy ľudí, ktorí riešili presne to, čo ja teraz riešim — a získať konkrétne kroky, nie vágne motivačné reči."
+      </blockquote>
+
+      <h3>Gap analýza</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Ideál</th><th>Súčasný stav</th><th>Konkrétna medzera</th></tr></thead>
+          <tbody>
+            <tr><td>Platforma s komunitou</td><td>Neexistuje</td><td>Treba validovať dopyt po komunite</td></tr>
+            <tr><td>Actionable obsah</td><td>Neexistuje</td><td>Treba vyvinúť formát s worksheetmi</td></tr>
+            <tr><td>Hosťovská sieť</td><td>Žiadne vzťahy</td><td>Treba vybudovať pipeline od nuly</td></tr>
+            <tr><td>Pravidelná produkcia</td><td>Nulová</td><td>Treba nastaviť workflow</td></tr>
+            <tr><td>5 000+ stiahnutí/epizódu</td><td>0</td><td>Treba 6–18 mesiacov konzistentnej práce</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Čo je dosiahnuteľné za 6–12 mesiacov: fungujúci podcast s 20+ epizódami, hosťovský pipeline, repurposing workflow na sociálne siete, zárodok komunity.</p>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ═══════════════ FÁZA 6 ═══════════════ -->
+    <section class="phase">
+      <div class="phase-header">
+        <span class="phase-num">Fáza 06</span>
+        <h2>Pre-mortem a riziková matica</h2>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th><th>Titulok postmortem</th><th>Pravdep.</th><th>Dopad</th><th>Skorý signál</th><th>Mitigácia</th><th>Tripwire</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>„Podfade: Po 7 epizódach zmĺkol"</td>
+              <td><strong style="color:var(--accent3)">Vysoká</strong></td>
+              <td>Katastrofický</td>
+              <td>Pocit „nemám čas", odkladanie</td>
+              <td>Batch recording (4 ep/deň), season formát</td>
+              <td>2 epizódy neskoro za sebou → batch systém</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>„Nikto nepočúva — 30 stiahnutí po 3 mesiacoch"</td>
+              <td>Stredná</td>
+              <td>Vysoký</td>
+              <td>Nulový rast po ep. 5</td>
+              <td>Distribučný plán od ep. 1, cross-promo</td>
+              <td>Po 10 ep. &lt; 50 stiahnutí → pivot formátu</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>„Hostia odmietajú alebo rušia"</td>
+              <td>Stredná</td>
+              <td>Stredný</td>
+              <td>Prvých 5 oslovení bez odpovede</td>
+              <td>Solo epizódy ako backup, warm intro stratégia</td>
+              <td>&lt;30 % response rate → zmeniť outreach</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>„Obsah je generický, neodlíšiteľný"</td>
+              <td>Stredná</td>
+              <td><strong style="color:var(--accent3)">Katastrofický</strong></td>
+              <td>Nízky completion rate (&lt;40 %)</td>
+              <td>Jasný uhol pohľadu, špecifická cieľovka</td>
+              <td>CR &lt; 40 % po 5 ep. → redesign</td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td>„Vyhorenie — podcast sa stal bremenom"</td>
+              <td><strong style="color:var(--accent3)">Vysoká</strong></td>
+              <td><strong style="color:var(--accent3)">Katastrofický</strong></td>
+              <td>Dreading nahrávania, klesajúca kvalita</td>
+              <td>Sustainable pace, season breaks, delegovanie strihu</td>
+              <td>3 týždne bez záujmu → 2-týžd. pauza + reflexia</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ═══════════════ FÁZA 7 ═══════════════ -->
+    <section class="phase">
+      <div class="phase-header">
+        <span class="phase-num">Fáza 07</span>
+        <h2>Pákový bod</h2>
+      </div>
+
+      <blockquote>
+        <strong>Pravidlo 10/90</strong>
+        10 % úsilia = repurposing workflow. Jedna nahrávka → podcast epizóda + 3–5 krátkych videí/audioclipov + 1 blogpost/newsletter. Toto 10 % práce navyše produkuje 90 % viditeľnosti.
+      </blockquote>
+
+      <h3>Kaskádová analýza</h3>
+      <div class="flow" style="flex-direction: column; align-items: flex-start; gap: 6px;">
+        <div class="flow-item">✦ Repurposing workflow vytvorený</div>
+        <span class="flow-arrow" style="padding-left: 16px;">↓</span>
+        <div class="flow-item">Každá epizóda generuje 5+ kusov obsahu na sociálne siete</div>
+        <span class="flow-arrow" style="padding-left: 16px;">↓</span>
+        <div class="flow-item">Organický reach stúpne 5–10×</div>
+        <span class="flow-arrow" style="padding-left: 16px;">↓</span>
+        <div class="flow-item">Noví poslucháči objavujú podcast</div>
+        <span class="flow-arrow" style="padding-left: 16px;">↓</span>
+        <div class="flow-item">Hostia chcú prísť (sociálny dôkaz)</div>
+        <span class="flow-arrow" style="padding-left: 16px;">↓</span>
+        <div class="flow-item">Lepší hostia = lepší obsah = vyšší completion rate</div>
+        <span class="flow-arrow" style="padding-left: 16px;">↓</span>
+        <div class="flow-item" style="background: rgba(232,197,71,0.15); border-color: rgba(232,197,71,0.4); color: var(--accent);">⟳ Virtuous cycle</div>
+      </div>
+
+      <h3>Minimum Viable Breakthrough (MVB)</h3>
+      <div class="card">
+        <p style="font-size:1.05rem; color:#e8eaf0; margin-bottom:10px;"><strong>Nahrať a publikovať 3 epizódy za 14 dní s repurposing plánom.</strong></p>
+        <p style="font-size:0.9rem;">Nie jednu perfektnú epizódu. Tri „dobré dosť" epizódy s krátkymi klipmi na LinkedIn / Instagram / TikTok. Prekonáva paralýzu, vytvára sociálny dôkaz pre budúcich hostí, testuje workflow a 3 epizódy dávajú dáta na optimalizáciu.</p>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ═══════════════ FÁZA 8 ═══════════════ -->
+    <section class="phase">
+      <div class="phase-header">
+        <span class="phase-num">Fáza 08</span>
+        <h2>Temporálna stratégia</h2>
+      </div>
+
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-phase">Teraz — 0 až 2 týždne</div>
+          <ul class="timeline-list">
+            <li>Definovať presnú cieľovku (napr. „IT profesionáli 25–35, ktorí zvažujú kariérny pivot")</li>
+            <li>Kúpiť mikrofón (Samson Q2U alebo Audio-Technica ATR2100x — ~60–80 €)</li>
+            <li>Nahrať pilotnú epizódu (solo alebo s kamarátom) — testovať workflow, nie perfekciu</li>
+            <li>Založiť hosting (Spotify for Podcasters = zadarmo)</li>
+            <li>Osloviť 10 potenciálnych hostí na prvú sezónu (warm kontakty)</li>
+          </ul>
+          <div class="anti-goal">
+            <strong>Anti-goals</strong>
+            NEkúpiť drahé vybavenie. NEtráviť viac ako 2 hodiny na logo/branding. NEčakať na „perfektný" moment.
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-phase">Ďalej — 2 až 8 týždňov</div>
+          <ul class="timeline-list">
+            <li>Nahrať a vydať prvé 3 epizódy naraz (launch batch)</li>
+            <li>Nastaviť repurposing workflow: epizóda → 3 klipy (Opus Clip, CapCut) → LinkedIn + Instagram</li>
+            <li>Vytvoriť jednoduchý landing page alebo Linktree</li>
+            <li>Zbierať feedback od prvých 20 poslucháčov (priamo sa ich pýtať)</li>
+            <li>Nastaviť batch recording systém (1 deň = 2–4 epizódy)</li>
+          </ul>
+          <div class="anti-goal">
+            <strong>Anti-goals</strong>
+            NEsnažiť sa o monetizáciu. NEporovnávať sa s veľkými podcastmi. NEoptimalizovať to, čo ste ešte nenamerali.
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-phase">Neskôr — 2 až 6 mesiacov</div>
+          <ul class="timeline-list">
+            <li>Season 1 hotová (8–10 epizód) → pauza, retrospektíva, dáta</li>
+            <li>Cross-promotion s inými podcastmi</li>
+            <li>Budovanie email listu / komunity</li>
+            <li>Testovanie monetizačných modelov (sponzor, premium obsah, služby)</li>
+            <li>Video verzia pre YouTube (ak dáta ukazujú dopyt)</li>
+          </ul>
+          <div class="anti-goal">
+            <strong>Anti-goals</strong>
+            NErozširovať sa na všetky platformy naraz. NEprijímať sponzorov, ktorí nerezonujú s cieľovkou.
+          </div>
+        </div>
+      </div>
+
+      <h3>Rozhodovací brány (Gates)</h3>
+      <div class="gate-grid">
+        <div class="gate-card">
+          <div class="gate-label">Gate 1</div>
+          <div class="gate-when">Po 3 epizódach (~3 týždne)</div>
+          <div class="gate-criteria">
+            <div class="go">&gt;50 stiahnutí, pozitívny feedback</div>
+            <div class="pivot">&lt;50, ale rastúci trend</div>
+            <div class="kill">Nenakrúcam, nemám chuť pokračovať</div>
+          </div>
+        </div>
+        <div class="gate-card">
+          <div class="gate-label">Gate 2</div>
+          <div class="gate-when">Po Sezóne 1 (10 epizód, ~3 mesiace)</div>
+          <div class="gate-criteria">
+            <div class="go">&gt;200 stiahnutí/ep., rastúci trend, 2+ hostia sami oslovili</div>
+            <div class="pivot">Stagnácia — pivot formát/cieľovku</div>
+            <div class="kill">&lt;50 stiahnutí/ep., žiadny rast, vyhorenie</div>
+          </div>
+        </div>
+        <div class="gate-card">
+          <div class="gate-label">Gate 3</div>
+          <div class="gate-when">6 mesiacov</div>
+          <div class="gate-criteria">
+            <div class="go">&gt;500 stiahnutí/ep., jasná cesta k monetizácii</div>
+            <div class="pivot">Stabilné ale pomalé — optimalizovať</div>
+            <div class="kill">Klesajúci trend, bez radosti</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ═══════════════ FÁZA 9 ═══════════════ -->
+    <section class="phase">
+      <div class="phase-header">
+        <span class="phase-num">Fáza 09</span>
+        <h2>Syntéza — Rekonštruovaný plán</h2>
+      </div>
+
+      <h3>Akčný plán</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Akcia</th><th>Kto</th><th>Deadline</th><th>Definition of Done</th></tr></thead>
+          <tbody>
+            <tr><td>Definovať cieľovku a positioning</td><td>Ja</td><td>Deň 1–2</td><td>1 veta: „Pre [koho] o [čom] aby [výsledok]"</td></tr>
+            <tr><td>Kúpiť mikrofón + nastaviť nahrávanie</td><td>Ja</td><td>Deň 3</td><td>Test nahrávka je zrozumiteľná</td></tr>
+            <tr><td>Nahrať pilot</td><td>Ja</td><td>Deň 5–7</td><td>Hotová epizóda, cut, publikovateľná</td></tr>
+            <tr><td>Osloviť 10 hostí</td><td>Ja</td><td>Deň 7–10</td><td>10 odoslaných personalizovaných správ</td></tr>
+            <tr><td>Launch batch (3 epizódy)</td><td>Ja</td><td>Deň 14–21</td><td>3 epizódy live na Spotify + Apple</td></tr>
+            <tr><td>Repurposing workflow</td><td>Ja</td><td>Deň 21–28</td><td>3 klipy/epizóda publikované na LinkedIn</td></tr>
+            <tr><td>Gate 1 review</td><td>Ja</td><td>Deň 30</td><td>Dáta zozbierané, rozhodnutie GO/PIVOT/KILL</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Bet Sizing</h3>
+      <div class="bet-grid">
+        <div class="bet-card">
+          <div class="bet-label all-in">✓ All-In</div>
+          <div class="bet-desc">Konzistentná produkcia + repurposing na sociálne siete (vysoká istota, že toto funguje).</div>
+        </div>
+        <div class="bet-card">
+          <div class="bet-label exp">⚗ Experiment</div>
+          <div class="bet-desc">Formát epizódy (solo vs. interview vs. mix) — testovať 3 rôzne v prvej sezóne.</div>
+        </div>
+        <div class="bet-card">
+          <div class="bet-label exp">⚗ Experiment</div>
+          <div class="bet-desc">Dĺžka (testovať 20 min, 35 min, 50 min — sledovať completion rate).</div>
+        </div>
+        <div class="bet-card">
+          <div class="bet-label exp">⚗ Experiment</div>
+          <div class="bet-desc">Video vs. audio-only — závisí od dopyt komunity.</div>
+        </div>
+      </div>
+
+      <h3>Rozhodovací framework</h3>
+      <div class="summary-box">
+        <div class="summary-row">
+          <div class="summary-label">Skutočný problém</div>
+          <div class="summary-value">Nie „ako spraviť podcast" ale „ako vybudovať distribučný engine pre kariérny obsah".</div>
+        </div>
+        <div class="summary-row">
+          <div class="summary-label">Pákový bod</div>
+          <div class="summary-value">Repurposing workflow — 1 epizóda = 5+ kusov obsahu na sociálne siete (discovery engine).</div>
+        </div>
+        <div class="summary-row">
+          <div class="summary-label">Prestať robiť</div>
+          <div class="summary-value">1) Plánovať namiesto robenia &nbsp; 2) Hľadať perfektné vybavenie &nbsp; 3) Rozmýšľať o monetizácii pred epizódou 20.</div>
+        </div>
+        <div class="summary-row">
+          <div class="summary-label">Skrytý obmedzujúci predpoklad</div>
+          <div class="summary-value">„Stačí publikovať a ľudia prídu" — NETESTOVANÉ. Podcast nemá natívny discovery. Distribúcia sa musí aktívne budovať.</div>
+        </div>
+        <div class="summary-row">
+          <div class="summary-label">Prvý krok (48h)</div>
+          <div class="summary-value">Definovať cieľovku v 1 vete + nahrať pilot (solo, 15–20 min, „prečo tento podcast").</div>
+        </div>
+        <div class="summary-row">
+          <div class="summary-label">Metrika úspechu</div>
+          <div class="summary-value">Min. 100 stiahnutí kumulatívne cez prvých 30 dní: 5 epizód + aspoň 3 potvrdení hostia.</div>
+        </div>
+        <div class="summary-row">
+          <div class="summary-label">Najväčšie riziko</div>
+          <div class="summary-value">„Podfade" — vyhorenie po epizóde 7. Skorý signál: odkladanie nahrávania 2× za sebou.</div>
+        </div>
+        <div class="summary-row">
+          <div class="summary-label">90-dňový cieľ</div>
+          <div class="summary-value">Sezóna 1 hotová (10 epizód), 200+ stiahnutí/ep., fungujúci repurposing pipeline, 5+ organických dopytov od hostí.</div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</body>
+</html>
